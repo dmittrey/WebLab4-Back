@@ -1,25 +1,58 @@
 package com.dmittrey.WebLab4Back.controller;
 
 import com.dmittrey.WebLab4Back.DTO.request.AuthRequest;
+import com.dmittrey.WebLab4Back.DTO.response.AuthResponse;
+import com.dmittrey.WebLab4Back.service.ValidationResultHandler;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
+
+@Slf4j
 @RestController
 @RequestMapping("/user")
 public class UserController {
 
-    @GetMapping("/login")
-    public ResponseEntity<?> loginUser(@RequestBody AuthRequest loginRequest) {
-        //Logic...
-        return null;
+    final ValidationResultHandler validationResultHandler;
+
+    public UserController(ValidationResultHandler validationResultHandler) {
+        this.validationResultHandler = validationResultHandler;
     }
 
-    @GetMapping("/register")
-    public ResponseEntity<?> registerUser(@RequestBody AuthRequest registerRequest) {
+    @PostMapping("/login")
+    public ResponseEntity<?> loginUser(@Valid @RequestBody AuthRequest loginRequest, BindingResult bindingResult) {
+
+        log.info("User is logging: {}", loginRequest);
+
+        if (bindingResult.hasErrors()) {
+            log.warn("Login rejected!");
+            return validationResultHandler.handleResult(bindingResult);
+        }
+
+
         //Logic...
-        return null;
+        //2) Сервис обработки main-logic
+        //3) Respository
+        //4) Прикрутить security постфактум
+
+        return new ResponseEntity<>(new AuthResponse(true), HttpStatus.OK);
+    }
+
+    @PostMapping("/register")
+    public ResponseEntity<?> registerUser(@Valid @RequestBody AuthRequest registerRequest, BindingResult bindingResult) {
+
+        log.info("User is registering: {}", registerRequest);
+
+        if (bindingResult.hasErrors()) {
+            log.warn("Register rejected!");
+            return validationResultHandler.handleResult(bindingResult);
+        }
+
+        //Logic...
+
+        return new ResponseEntity<>(new AuthResponse(true), HttpStatus.OK);
     }
 }

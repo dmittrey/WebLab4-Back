@@ -1,15 +1,9 @@
 package com.dmittrey.WebLab4Back.DTO.response;
 
 import com.dmittrey.WebLab4Back.DTO.utility.Point;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.Data;
 
-@NoArgsConstructor
-@AllArgsConstructor
-@Getter
-@Setter
+@Data
 public class HitResponse {
     private Point[] data;
 }

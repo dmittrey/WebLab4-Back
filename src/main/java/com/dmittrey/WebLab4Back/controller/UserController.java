@@ -2,9 +2,12 @@ package com.dmittrey.WebLab4Back.controller;
 
 import com.dmittrey.WebLab4Back.DTO.request.AuthRequest;
 import com.dmittrey.WebLab4Back.DTO.response.AuthResponse;
+import com.dmittrey.WebLab4Back.entities.UserEntity;
+import com.dmittrey.WebLab4Back.service.DTOConverter;
+import com.dmittrey.WebLab4Back.service.RequestHandler;
 import com.dmittrey.WebLab4Back.service.ValidationResultHandler;
+import com.dmittrey.WebLab4Back.utility.AuthRequestType;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -17,9 +20,15 @@ import javax.validation.Valid;
 public class UserController {
 
     final ValidationResultHandler validationResultHandler;
+    final DTOConverter dtoConverter;
+    final RequestHandler requestHandler;
 
-    public UserController(ValidationResultHandler validationResultHandler) {
-        this.validationResultHandler = validationResultHandler;
+    public UserController(ValidationResultHandler aValidationResultHandler,
+                         DTOConverter aDTOConverter,
+                         RequestHandler aRequestHandler) {
+        validationResultHandler = aValidationResultHandler;
+        dtoConverter = aDTOConverter;
+        requestHandler = aRequestHandler;
     }
 
     @PostMapping("/login")
@@ -32,13 +41,11 @@ public class UserController {
             return validationResultHandler.handleResult(bindingResult);
         }
 
+        UserEntity userEntity = dtoConverter.convertAuthToEntity(loginRequest);
 
-        //Logic...
-        //2) Сервис обработки main-logic
-        //3) Respository
-        //4) Прикрутить security постфактум
+        AuthResponse authResponse = requestHandler.processAuthentication(userEntity, AuthRequestType.LOGIN);
 
-        return new ResponseEntity<>(new AuthResponse(true), HttpStatus.OK);
+        return ResponseEntity.ok(authResponse);
     }
 
     @PostMapping("/register")
@@ -51,8 +58,10 @@ public class UserController {
             return validationResultHandler.handleResult(bindingResult);
         }
 
-        //Logic...
+        UserEntity userEntity = dtoConverter.convertAuthToEntity(registerRequest);
 
-        return new ResponseEntity<>(new AuthResponse(true), HttpStatus.OK);
+        AuthResponse authResponse = requestHandler.processAuthentication(userEntity, AuthRequestType.REGISTER);
+
+        return ResponseEntity.ok(authResponse);
     }
 }

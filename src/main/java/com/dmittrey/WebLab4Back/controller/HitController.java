@@ -1,72 +1,76 @@
 package com.dmittrey.WebLab4Back.controller;
 
 import com.dmittrey.WebLab4Back.DTO.request.HitRequest;
-import com.dmittrey.WebLab4Back.DTO.utility.Point;
+import com.dmittrey.WebLab4Back.DTO.response.HitResponse;
+import com.dmittrey.WebLab4Back.entities.HitEntity;
+import com.dmittrey.WebLab4Back.service.DTOConverter;
+import com.dmittrey.WebLab4Back.service.RequestHandler;
 import com.dmittrey.WebLab4Back.service.ValidationResultHandler;
+import com.dmittrey.WebLab4Back.utility.HitRequestType;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.time.LocalDate;
 
 @Slf4j
 @RestController
 @RequestMapping("/hit")
 public class HitController {
 
-    final ValidationResultHandler validationResultHandler;
+    //todo Надо переделать логику и отправлять еще и пользователя
 
-    public HitController(ValidationResultHandler validationResultHandler) {
-        this.validationResultHandler = validationResultHandler;
+    final ValidationResultHandler validationResultHandler;
+    final DTOConverter dtoConverter;
+    final RequestHandler requestHandler;
+
+    public HitController(ValidationResultHandler aValidationResultHandler,
+                         DTOConverter aDTOConverter,
+                         RequestHandler aRequestHandler) {
+        validationResultHandler = aValidationResultHandler;
+        dtoConverter = aDTOConverter;
+        requestHandler = aRequestHandler;
     }
 
     @PostMapping("/add")
     public ResponseEntity<?> addHit(@Valid @RequestBody HitRequest addHitRequest, BindingResult bindingResult) {
 
-        log.info("Client sent point coordinates: {}", addHitRequest);
+        log.info("Client sent point coordinates: {}!", addHitRequest);
 
         if (bindingResult.hasErrors()) {
             log.warn("Point add rejected!");
             return validationResultHandler.handleResult(bindingResult);
         }
 
-        Point initPoint = new Point();
-        initPoint.setHitResult(false);
-        initPoint.setCurrentTime(LocalDate.now().toString());
-        initPoint.setExecutionTime("0");
-        //Logic...
+        HitEntity hitEntity = dtoConverter.convertHitToEntity(addHitRequest);
 
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(new Point[]{initPoint});
+        HitResponse hitResponse = requestHandler.processHit(hitEntity, HitRequestType.ADD);
+
+        return ResponseEntity.ok(hitResponse);
     }
 
     @PostMapping("/remove_all")
-    public ResponseEntity<?> removeAllHits(@RequestBody HitRequest removeAllHitsRequest, BindingResult bindingResult) {
+    public ResponseEntity<?> removeAllHits() {
 
-        if (bindingResult.hasErrors()) {
-            log.warn("Removing all points rejected!");
-            return validationResultHandler.handleResult(bindingResult);
-        }
+        log.info("Removing all hits!");
 
-        //Logic...
+        HitEntity hitEntity = new HitEntity();
 
-        return ResponseEntity.status(HttpStatus.OK).body(null);
+        HitResponse hitResponse = requestHandler.processHit(HitRequestType.REMOVE_ALL);
+
+        return ResponseEntity.ok(hitResponse);
     }
 
     @PostMapping("/get_all")
-    public ResponseEntity<?> getAllHits(@RequestBody HitRequest getAllHitsRequest, BindingResult bindingResult) {
+    public ResponseEntity<?> getAllHits() {
 
-        if (bindingResult.hasErrors()) {
-            log.warn("Getting all points rejected!");
-            return validationResultHandler.handleResult(bindingResult);
-        }
+        log.info("Getting all hits!");
 
-        //Logic...
+        HitEntity hitEntity = new HitEntity();
 
-        return ResponseEntity.status(HttpStatus.OK).body(null);
+        HitResponse hitResponse = requestHandler.processHit(HitRequestType.ADD);
+
+        return ResponseEntity.ok(hitResponse);
     }
 }

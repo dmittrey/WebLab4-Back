@@ -1,4 +1,4 @@
-package com.dmittrey.WebLab4Back.security;
+package com.dmittrey.WebLab4Back.config;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;

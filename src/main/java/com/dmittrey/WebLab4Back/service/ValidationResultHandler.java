@@ -14,7 +14,7 @@ public class ValidationResultHandler {
                 .getFieldErrors()
                 .stream()
                 .map(DefaultMessageSourceResolvable::getDefaultMessage)
-                .forEach(mes -> sb.append(mes).append("!\n"));
+                .forEach(mes -> sb.append(mes).append("!"));
         return ResponseEntity.badRequest().body(sb.toString());
     }
 }

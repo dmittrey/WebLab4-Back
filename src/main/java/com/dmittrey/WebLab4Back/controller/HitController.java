@@ -2,11 +2,7 @@ package com.dmittrey.WebLab4Back.controller;
 
 import com.dmittrey.WebLab4Back.DTO.request.HitRequest;
 import com.dmittrey.WebLab4Back.DTO.response.HitResponse;
-import com.dmittrey.WebLab4Back.entities.HitEntity;
-import com.dmittrey.WebLab4Back.service.DTOConverter;
-import com.dmittrey.WebLab4Back.service.RequestHandler;
-import com.dmittrey.WebLab4Back.service.ValidationResultHandler;
-import com.dmittrey.WebLab4Back.utility.HitRequestType;
+import com.dmittrey.WebLab4Back.service.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -18,19 +14,16 @@ import javax.validation.Valid;
 @RestController
 @RequestMapping("/hit")
 public class HitController {
-
-    //todo Надо переделать логику и отправлять еще и пользователя
-
     final ValidationResultHandler validationResultHandler;
-    final DTOConverter dtoConverter;
-    final RequestHandler requestHandler;
+    final UserService userService;
+    final HitService hitService;
 
     public HitController(ValidationResultHandler aValidationResultHandler,
-                         DTOConverter aDTOConverter,
-                         RequestHandler aRequestHandler) {
+                         UserService anUserService,
+                         HitService aHitService) {
         validationResultHandler = aValidationResultHandler;
-        dtoConverter = aDTOConverter;
-        requestHandler = aRequestHandler;
+        userService = anUserService;
+        hitService = aHitService;
     }
 
     @PostMapping("/add")
@@ -43,11 +36,9 @@ public class HitController {
             return validationResultHandler.handleResult(bindingResult);
         }
 
-        HitEntity hitEntity = dtoConverter.convertHitToEntity(addHitRequest);
+        //Logic...
 
-        HitResponse hitResponse = requestHandler.processHit(hitEntity, HitRequestType.ADD);
-
-        return ResponseEntity.ok(hitResponse);
+        return ResponseEntity.ok(new HitResponse());
     }
 
     @PostMapping("/remove_all")
@@ -55,11 +46,9 @@ public class HitController {
 
         log.info("Removing all hits!");
 
-        HitEntity hitEntity = new HitEntity();
+        //Logic...
 
-        HitResponse hitResponse = requestHandler.processHit(HitRequestType.REMOVE_ALL);
-
-        return ResponseEntity.ok(hitResponse);
+        return ResponseEntity.ok(new HitResponse());
     }
 
     @PostMapping("/get_all")
@@ -67,10 +56,8 @@ public class HitController {
 
         log.info("Getting all hits!");
 
-        HitEntity hitEntity = new HitEntity();
+        //Logic...
 
-        HitResponse hitResponse = requestHandler.processHit(HitRequestType.ADD);
-
-        return ResponseEntity.ok(hitResponse);
+        return ResponseEntity.ok(new HitResponse());
     }
 }

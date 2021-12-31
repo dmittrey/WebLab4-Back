@@ -10,12 +10,4 @@ public class WebLab4BackApplication {
 		SpringApplication.run(WebLab4BackApplication.class, args);
 	}
 
-
-	//todo Перевод в entities
-	// Логику обработки и высчитывания полей в сервисе
-	// Логику работы с бд в репозитории
-	// Донастроить security
-
-	//ssh -L 1521:se.ifmo.ru:1521 -p 2222 s312502@se.ifmo.ru
-
 }

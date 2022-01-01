@@ -8,7 +8,11 @@ public interface UserService {
 
     void saveUser(User user);
 
-    boolean checkForSavedState(User user);
+    boolean checkForSavedStateByUserId(Long userId);
+
+    boolean checkForSavedStateByUsername(String username);
+
+    Optional<User> findByUserId(Long userId);
 
     Optional<User> findByUsername(String username);
 }

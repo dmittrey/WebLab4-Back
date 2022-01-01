@@ -13,11 +13,4 @@ public class UserFormsConverter {
         user.setPassword(authRequest.getPassword());
         return user;
     }
-
-    public AuthRequest convertFromUserEntity(User user) {
-        AuthRequest authRequest = new AuthRequest();
-        authRequest.setUsername(user.getUsername());
-        authRequest.setPassword(user.getPassword());
-        return authRequest;
-    }
 }

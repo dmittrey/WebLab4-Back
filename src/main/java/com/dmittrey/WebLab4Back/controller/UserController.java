@@ -51,36 +51,30 @@ public class UserController {
     @PostMapping("/login")
     public ResponseEntity<?> loginUser(@Valid @RequestBody AuthRequest loginRequest, BindingResult bindingResult) {
 
-        log.info("In login!");
         try {
+            log.info("User {} is entering!", loginRequest);
+
             if (bindingResult.hasErrors()) {
                 log.warn("Login rejected!");
-                return ResponseEntity.badRequest().build();
+                return ResponseEntity.badRequest().body(null);
             }
 
             String username = loginRequest.getUsername();
-
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, loginRequest.getPassword()));
-
             Optional<User> user = userService.findByUsername(username);
-            log.info("Поискали");
 
             if (!user.isPresent()) {
-                log.info("User not found!");
+                log.info("Credentials not found in DB!");
                 throw new UsernameNotFoundException("User with username: " + username + " not found");
             }
 
-            log.info("User is logging: {}", user.get());
+            log.info("User {} entered successfully!", user.get());
 
             String token = jwtTokenProvider.createToken(user.get());
 
-            AuthResponse response = new AuthResponse();
-            response.setUsername(username);
-            response.setToken(token);
-
-            log.info("Response: {}", response);
-
-            return ResponseEntity.ok(response);
+            return ResponseEntity.ok(
+                    new AuthResponse(username, token)
+            );
         } catch (AuthenticationException e) {
             throw new BadCredentialsException("Invalid username or password");
         }
@@ -90,22 +84,26 @@ public class UserController {
     @PostMapping("/register")
     public ResponseEntity<?> registerUser(@Valid @RequestBody AuthRequest registerRequest, BindingResult bindingResult) {
 
-        log.info("User is registering: {}", registerRequest);
+        log.info("User {} is registering!", registerRequest);
 
         if (bindingResult.hasErrors()) {
             log.warn("Register rejected!");
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.badRequest().body(null);
         }
 
         User newUser = formsConverter.convertAuthToEntity(registerRequest);
 
-        if (!userService.checkForSavedState(newUser)) {
+        if (!userService.checkForSavedStateByUsername(newUser.getUsername())) {
             userService.saveUser(newUser);
-            log.info("Зарегистрировали!");
-            //Отдать токен
+            log.info("Registered!");
+
+            String token = jwtTokenProvider.createToken(newUser);
+
+            return ResponseEntity.ok(
+                    new AuthResponse(newUser.getUsername(), token)
+            );
         } else {
-            log.info("Уже зарегистрирован!");
-            //Выкинуть ошибку и обработать
+            log.info("Already registered!");
         }
 
         return ResponseEntity.ok(new AuthResponse());

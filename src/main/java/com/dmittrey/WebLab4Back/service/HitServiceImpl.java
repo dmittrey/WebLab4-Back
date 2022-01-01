@@ -6,34 +6,46 @@ import com.dmittrey.WebLab4Back.entities.Hit;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class HitServiceImpl implements HitService{
+public class HitServiceImpl implements HitService {
 
     private final UserRepo userRepo;
     private final HitRepo hitRepo;
 
     @Override
-    public Hit saveHit(String userId, Hit hit) {
+    public void saveHitByUserId(Long userId, Hit hit) {
+
+        log.info("Сохраняем попадание");
+
         userRepo.findById(userId).ifPresent(user -> {
             hit.setUser(user);
             hitRepo.save(hit);
         });
 
-        return hit;
+        log.info("Сохранили попадание");
     }
 
     @Override
-    public List<Hit> getAllHitsByUserUsername(String username) {
+    public List<Hit> getAllHitsByUserId(String username) {
+
+        log.info("Возвращаем список");
+
         return hitRepo.findAllByUserUsername(username);
     }
 
     @Override
-    public void removeAllHitsByUserUsername(String username) {
+    public void removeAllHitsByUserId(String username) {
+
+        log.info("Начали удалять");
+
         hitRepo.deleteAllByUserUsername(username);
+
+        log.info("Закончили удалять");
     }
 }

@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
@@ -25,18 +26,30 @@ public class UserServiceImpl implements UserService {
         user.setRole(Roles.USER);
         user.setStatus(Status.ACTIVE);
 
-        log.info("IN register - user: {} successfully registered", user);
-
         userRepo.save(user);
     }
 
     @Override
-    public boolean checkForSavedState(User user) {
-        return userRepo.existsByUsername(user.getUsername());
+    public boolean checkForSavedStateByUserId(Long userId) {
+
+        return userRepo.existsById(userId);
+    }
+
+    @Override
+    public boolean checkForSavedStateByUsername(String username) {
+
+        return userRepo.existsByUsername(username);
+    }
+
+    @Override
+    public Optional<User> findByUserId(Long userId) {
+
+        return userRepo.findById(userId);
     }
 
     @Override
     public Optional<User> findByUsername(String username) {
+
         return userRepo.findByUsername(username);
     }
 

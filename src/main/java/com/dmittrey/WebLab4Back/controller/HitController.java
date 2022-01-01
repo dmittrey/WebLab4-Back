@@ -1,18 +1,27 @@
 package com.dmittrey.WebLab4Back.controller;
 
 import com.dmittrey.WebLab4Back.DTO.request.HitRequest;
-import com.dmittrey.WebLab4Back.DTO.response.HitResponse;
 import com.dmittrey.WebLab4Back.converter.HitFormsConverter;
 import com.dmittrey.WebLab4Back.entities.Hit;
-import com.dmittrey.WebLab4Back.service.*;
+import com.dmittrey.WebLab4Back.security.jwt.JwtUser;
+import com.dmittrey.WebLab4Back.service.AreaCheck;
+import com.dmittrey.WebLab4Back.service.HitService;
+import com.dmittrey.WebLab4Back.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Collections;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RestController
@@ -49,17 +58,14 @@ public class HitController {
         Hit newHit = hitFormsConverter.convertHitToEntity(addHitRequest);
 
         newHit.setResult(areaHitChecker.checkHitResult(newHit));
-
         newHit.setCurrentTime(LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss")));
-
         newHit.setExecutionTime((double) (System.nanoTime() - serviceStartTime) / 100000);
 
-        log.info(newHit.toString());
-        /*
-        3) Сохранить за юзером
-         */
+        JwtUser user = resolveJwtUser();
+        log.info("User id: {}", user.getId());
+        hitService.saveHitByUserId(user.getId(), newHit);
 
-        return ResponseEntity.ok(new HitResponse());
+        return ResponseEntity.ok().body(Collections.singletonList(hitFormsConverter.convertEntityToPoint(newHit)));
     }
 
     @PostMapping("/remove_all")
@@ -67,11 +73,10 @@ public class HitController {
 
         log.info("Removing all hits!");
 
-        /*
-        Удалить все точки закрепленные за определенным юзером
-         */
+        JwtUser user = resolveJwtUser();
+        hitService.removeAllHitsByUserId(user.getUsername());
 
-        return ResponseEntity.ok(new HitResponse());
+        return ResponseEntity.ok().body("Hi!");
     }
 
     @PostMapping("/get_all")
@@ -79,10 +84,18 @@ public class HitController {
 
         log.info("Getting all hits!");
 
-        /*
-        Вернуть все точки закрепленные за определенным юзером
-         */
+        JwtUser user = resolveJwtUser();
 
-        return ResponseEntity.ok(new HitResponse());
+        return ResponseEntity.ok().body(
+                hitService.getAllHitsByUserId(user.getUsername())
+                        .stream()
+                        .map(hitFormsConverter::convertEntityToPoint)
+                        .collect(Collectors.toList())
+        );
+    }
+
+    private JwtUser resolveJwtUser() {
+        Authentication authDetails = SecurityContextHolder.getContext().getAuthentication();
+        return (JwtUser) authDetails.getPrincipal();
     }
 }

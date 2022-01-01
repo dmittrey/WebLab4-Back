@@ -1,37 +1,38 @@
 package com.dmittrey.WebLab4Back.entities;
 
-import lombok.*;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
-@Entity
-@Table(name = "hit_tb")
 @Data
 @NoArgsConstructor
-@AllArgsConstructor
-@Builder
+@Entity
+@Table(name = "hits")
 public class Hit {
-
     @Id
-    @SequenceGenerator(
-            name = "hit_sequence",
-            sequenceName = "hit_sequence",
-            allocationSize = 1
-    )
-    @GeneratedValue(
-            strategy = GenerationType.SEQUENCE,
-            generator = "hit_sequence"
-    )
-    private Long hitId;
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
 
-    private Double x;
-    private Double y;
-    private Double r;
+    @Column(name = "x")
+    private double x;
+
+    @Column(name = "y")
+    private double y;
+
+    @Column(name = "r")
+    private double r;
+
+    @Column(name = "current_time")
     private String currentTime;
+
+    @Column(name = "execution_time")
     private Double executionTime;
+
+    @Column(name = "result")
     private Boolean result;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
+    @ManyToOne
+    @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User user;
 }

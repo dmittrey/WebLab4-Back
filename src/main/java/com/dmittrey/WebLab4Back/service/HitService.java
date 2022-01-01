@@ -6,9 +6,9 @@ import java.util.List;
 
 public interface HitService {
 
-    Hit saveHit(String userId, Hit hit);
+    void saveHitByUserId(Long userId, Hit hit);
 
-    List<Hit> getAllHitsByUserUsername(String username);
+    List<Hit> getAllHitsByUserId(String username);
 
-    void removeAllHitsByUserUsername(String userId);
+    void removeAllHitsByUserId(String username);
 }

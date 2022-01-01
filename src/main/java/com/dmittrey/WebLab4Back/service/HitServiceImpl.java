@@ -18,9 +18,8 @@ public class HitServiceImpl implements HitService{
     private final HitRepo hitRepo;
 
     @Override
-    public Hit saveHit(Long userId, Hit hit) {
+    public Hit saveHit(String userId, Hit hit) {
         userRepo.findById(userId).ifPresent(user -> {
-            log.info("Ya zdecb");
             hit.setUser(user);
             hitRepo.save(hit);
         });
@@ -29,12 +28,12 @@ public class HitServiceImpl implements HitService{
     }
 
     @Override
-    public List<Hit> getAllHitsByUserId(Long userId) {
-        return hitRepo.findAllByUser_UserId(userId);
+    public List<Hit> getAllHitsByUserUsername(String username) {
+        return hitRepo.findAllByUserUsername(username);
     }
 
     @Override
-    public void removeAllHitsByUserId(Long userId) {
-        hitRepo.deleteAllByUser_UserId(userId);
+    public void removeAllHitsByUserUsername(String username) {
+        hitRepo.deleteAllByUserUsername(username);
     }
 }

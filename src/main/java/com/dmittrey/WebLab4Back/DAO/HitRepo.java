@@ -9,7 +9,7 @@ import java.util.List;
 @Repository
 public interface HitRepo extends JpaRepository<Hit, Long> {
 
-    void deleteAllByUser_UserId(Long userId);
+    void deleteAllByUserUsername(String username);
 
-    List<Hit> findAllByUser_UserId(Long userId);
+    List<Hit> findAllByUserUsername(String username);
 }

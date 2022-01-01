@@ -4,9 +4,12 @@ import com.dmittrey.WebLab4Back.entities.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-@Repository
-public interface UserRepo extends JpaRepository<User, Long> {
+import java.util.Optional;
 
-    @Override
-    <S extends User> S save(S userEntity);
+@Repository
+public interface UserRepo extends JpaRepository<User, String> {
+
+    boolean existsByUsername(String username);
+
+    Optional<User> findByUsername(String username);
 }

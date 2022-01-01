@@ -32,6 +32,12 @@ public class User {
     private String username;
     private String password;
 
+    @Enumerated(EnumType.STRING)
+    private Status status;
+
+    @Enumerated(EnumType.STRING)
+    private Roles role;
+
     @OneToMany(
             cascade = CascadeType.ALL,
             fetch = FetchType.EAGER

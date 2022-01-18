@@ -1,6 +1,8 @@
 package com.dmittrey.WebLab4Back.controller;
 
 import com.dmittrey.WebLab4Back.DTO.request.HitRequest;
+import com.dmittrey.WebLab4Back.DTO.response.HitResponse;
+import com.dmittrey.WebLab4Back.DTO.utility.Point;
 import com.dmittrey.WebLab4Back.converter.HitFormsConverter;
 import com.dmittrey.WebLab4Back.entities.Hit;
 import com.dmittrey.WebLab4Back.security.jwt.JwtUser;
@@ -14,6 +16,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.processing.SupportedOptions;
 import javax.validation.Valid;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -62,10 +65,16 @@ public class HitController {
         log.info("User id: {}", user.getId());
         hitService.saveHitByUserId(user.getId(), newHit);
 
-        return ResponseEntity.ok().body(Collections.singletonList(hitFormsConverter.convertEntityToPoint(newHit)));
+        return ResponseEntity.ok().body(
+                new HitResponse(
+                        Collections.singletonList(
+                                hitFormsConverter.convertEntityToPoint(newHit)
+                        )
+                )
+        );
     }
 
-    @PostMapping("/remove_all")
+    @GetMapping("/remove_all")
     public ResponseEntity<?> removeAllHits() {
 
         log.info("Removing all hits!");
@@ -73,10 +82,14 @@ public class HitController {
         JwtUser user = resolveJwtUser();
         hitService.removeAllHitsByUserId(user.getUsername());
 
-        return ResponseEntity.ok().body("Hi!");
+        return ResponseEntity.ok().body(
+                new HitResponse(
+                        Collections.EMPTY_LIST
+                )
+        );
     }
 
-    @PostMapping("/get_all")
+    @GetMapping("/get_all")
     public ResponseEntity<?> getAllHits() {
 
         log.info("Getting all hits!");
@@ -84,10 +97,11 @@ public class HitController {
         JwtUser user = resolveJwtUser();
 
         return ResponseEntity.ok().body(
-                hitService.getAllHitsByUserId(user.getUsername())
-                        .stream()
-                        .map(hitFormsConverter::convertEntityToPoint)
-                        .collect(Collectors.toList())
+                new HitResponse(
+                        hitService.getAllHitsByUserId(user.getUsername())
+                                .stream()
+                                .map(hitFormsConverter::convertEntityToPoint)
+                                .collect(Collectors.toList()))
         );
     }
 

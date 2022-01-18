@@ -7,5 +7,5 @@ import java.util.List;
 
 @Data
 public class HitResponse {
-    private List<Point> data;
+    private final List<Point> data;
 }
